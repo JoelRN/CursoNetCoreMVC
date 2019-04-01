@@ -9,24 +9,25 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using SistemaAC.Models;
 
 namespace SistemaAC.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
     public class RegisterModel : PageModel
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
-        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly RoleManager<ApplicationRole> _roleManager;
 
         public RegisterModel(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<ApplicationRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -69,7 +70,7 @@ namespace SistemaAC.Areas.Identity.Pages.Account
             returnUrl = returnUrl ?? Url.Content("~/");
             if (ModelState.IsValid)
             {
-                var user = new IdentityUser { UserName = Input.Email, Email = Input.Email };
+                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
@@ -89,7 +90,7 @@ namespace SistemaAC.Areas.Identity.Pages.Account
                     var xRol = await _roleManager.RoleExistsAsync("Administrador");
                     if (!xRol)
                     {
-                        var role = new IdentityRole("Administrador");
+                        var role = new ApplicationRole("Administrador");
                         var res = await _roleManager.CreateAsync(role);
 
                         if (res.Succeeded)
@@ -109,14 +110,14 @@ namespace SistemaAC.Areas.Identity.Pages.Account
                     xRol = await _roleManager.RoleExistsAsync("Usuario");
                     if (!xRol)
                     {
-                        var role = new IdentityRole("Usuario");
+                        var role = new ApplicationRole("Usuario");
                         await _roleManager.CreateAsync(role);
                     }
 
                     xRol = await _roleManager.RoleExistsAsync("Asistente");
                     if (!xRol)
                     {
-                        var role = new IdentityRole("Asistente");
+                        var role = new ApplicationRole("Asistente");
                         await _roleManager.CreateAsync(role);
                     }
 

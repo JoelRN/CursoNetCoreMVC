@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using SistemaAC.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SistemaAC.Models;
 
 namespace SistemaAC
 {
@@ -38,8 +39,8 @@ namespace SistemaAC
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddIdentity<IdentityUser, IdentityRole>()
-                .AddRoleManager<RoleManager<IdentityRole>>()
+            services.AddIdentity<ApplicationUser, ApplicationRole>()
+                .AddRoleManager<RoleManager<ApplicationRole>>()
                 .AddDefaultUI()
                 .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
