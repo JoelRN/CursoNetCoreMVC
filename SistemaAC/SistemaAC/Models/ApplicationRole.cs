@@ -9,8 +9,6 @@ namespace SistemaAC.Models
 {
     public class ApplicationRole : IdentityRole<Guid>
     {
-        public string Description { get; set; }
-
         public ApplicationRole(string Name)
         {
             this.Name = Name;

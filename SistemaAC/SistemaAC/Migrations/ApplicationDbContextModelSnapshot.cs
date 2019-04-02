@@ -110,8 +110,6 @@ namespace SistemaAC.Migrations
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
 
-                    b.Property<string>("Description");
-
                     b.Property<string>("Name")
                         .HasMaxLength(256);
 
@@ -137,8 +135,6 @@ namespace SistemaAC.Migrations
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
-
-                    b.Property<string>("CustomTag");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256);
