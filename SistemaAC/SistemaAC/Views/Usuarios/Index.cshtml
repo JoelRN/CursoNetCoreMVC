@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SistemaAC.Models.ApplicationUser>
+﻿@model IEnumerable<SistemaAC.Models.Usuario>
 
 @{
     ViewData["Title"] = "Index";
@@ -16,6 +16,9 @@
                 Usuario
             </th>
             <th>
+                Rol
+            </th>
+            <th>
                 Email
             </th>
             <th>
@@ -31,6 +34,9 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.UserName)
                 </td>
+                <th>
+                    @Html.DisplayFor(modelItem => item.Role)
+                </th>
                 <td>
                     @Html.DisplayFor(modelItem => item.Email)
                 </td>
@@ -39,8 +45,8 @@
                 </td>
                 <td>
                     <a class="btn btn-success" data-toggle="modal" data-target="#modalEditar" onclick="getUsuario('@item.Id','Usuarios/GetUsuario')">Edit</a> |
-                    <a class="btn btn-info" asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <a class="btn btn-info" asp-action="Details" asp-route-id="@item.Id">Detalles</a> |
+                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.Id">Eliminar</a>
                 </td>
             </tr>
         }
@@ -75,7 +81,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary">Guardar Cambios</button>
+                <button type="button" class="btn btn-primary" onclick="editarUsuario('Usuarios/EditUsuario')">Guardar Cambios</button>
             </div>
         </div>
     </div>

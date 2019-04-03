@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -14,15 +15,58 @@ namespace SistemaAC.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        public UsuariosController(ApplicationDbContext context)
+        UserManager<ApplicationUser> _userManager;
+        RoleManager<ApplicationRole> _roleManager;
+        UsuarioRole _usuarioRole;
+        public List<SelectListItem> usuarioRole;
+        
+        public UsuariosController(ApplicationDbContext context,
+            UserManager<ApplicationUser> userManager,
+            RoleManager<ApplicationRole> roleManager)
         {
             _context = context;
+            _userManager = userManager;
+            _roleManager = roleManager;
+            _usuarioRole = new UsuarioRole();
+            usuarioRole = new List<SelectListItem>();
         }
 
         // GET: Usuarios
         public async Task<IActionResult> Index()
         {
-            return View(await _context.ApplicationUser.ToListAsync());
+            //Declaro una variable ID inicializado vacia
+            var ID = "";
+            //Declaro un objeto list que depende la clase Usuario
+            List<Usuario> usuario = new List<Usuario>();
+            //Ahora obtengo todos los registros de la tabla donde almaceno los usuarios
+            //y lo almaceno en el objeto
+            var appUsuario = await _context.ApplicationUser.ToListAsync();
+
+            //ahora con una estructura foreach vamos a recorrer
+            //todos los valores del objeto appUsuario
+            foreach (var Data in appUsuario)
+            {
+                ID = Data.Id.ToString();
+                //LLamamos al metodo getRol que nos permitira
+                //obtener el rol segun un usuario especifico
+                usuarioRole = await _usuarioRole.GetRole(_userManager, _roleManager, ID);
+
+                //Agregamos a la lista del tipo usuario uno a uno los
+                //registros del usuario, teniendo en cuenta
+                //solo los atributos específicos de la clase Usuario
+                //Recordemos que el objeto data hace referencia a la clase ApplicationUser y
+                //el objeto usuario es una lista del tipo Usuario (Clase Usuario)
+                usuario.Add(new Usuario()
+                {
+                    Id = Data.Id.ToString(),
+                    UserName = Data.UserName,
+                    PhoneNumber = Data.PhoneNumber,
+                    Email = Data.Email,
+                    Role = usuarioRole[0].Text
+                });
+            }
+
+            return View(usuario.ToList());
         }
 
         public async Task<List<ApplicationUser>> GetUsuario(Guid id)
@@ -33,125 +77,45 @@ namespace SistemaAC.Controllers
             return usuario;
         }
 
-        // GET: Usuarios/Details/5
-        public async Task<IActionResult> Details(Guid? id)
+        public async Task<string> EditUsuario(string id, string userName, string email,
+            string phoneNumber, int accessFailedCount, string concurrencyStamp, bool emailConfirmed,
+            bool lockoutEnabled, DateTimeOffset lockoutEnd, string normalizedEmail,
+            string normalizedUserName, string passwordHash, bool phoneNumberConfirmed,
+            string securityStamp, bool twoFactorEnabled, ApplicationUser applicationUser)
         {
-            if (id == null)
+            var resp = "";
+
+            try
             {
-                return NotFound();
-            }
+                applicationUser = new ApplicationUser
+                {
+                    Id = new Guid(id),
+                    UserName = userName,
+                    Email = email,
+                    PhoneNumber = phoneNumber,
+                    AccessFailedCount = accessFailedCount,
+                    ConcurrencyStamp = concurrencyStamp,
+                    EmailConfirmed = emailConfirmed,
+                    LockoutEnabled = lockoutEnabled,
+                    LockoutEnd = lockoutEnd,
+                    NormalizedEmail = normalizedEmail,
+                    NormalizedUserName = normalizedUserName,
+                    PasswordHash = passwordHash,
+                    PhoneNumberConfirmed = phoneNumberConfirmed,
+                    SecurityStamp = securityStamp,
+                    TwoFactorEnabled = twoFactorEnabled
+                };
 
-            var applicationUser = await _context.ApplicationUser
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (applicationUser == null)
-            {
-                return NotFound();
-            }
-
-            return View(applicationUser);
-        }
-
-        // GET: Usuarios/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Usuarios/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,UserName,NormalizedUserName,Email,NormalizedEmail,EmailConfirmed,PasswordHash,SecurityStamp,ConcurrencyStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] ApplicationUser applicationUser)
-        {
-            if (ModelState.IsValid)
-            {
-                applicationUser.Id = Guid.NewGuid();
-                _context.Add(applicationUser);
+                //Actualizar los datos
+                _context.Update(applicationUser);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                resp = "Save";
             }
-            return View(applicationUser);
-        }
-
-        // GET: Usuarios/Edit/5
-        public async Task<IActionResult> Edit(Guid? id)
-        {
-            if (id == null)
+            catch
             {
-                return NotFound();
+                resp = "No Save";
             }
-
-            var applicationUser = await _context.ApplicationUser.FindAsync(id);
-            if (applicationUser == null)
-            {
-                return NotFound();
-            }
-            return View(applicationUser);
-        }
-
-        // POST: Usuarios/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,UserName,NormalizedUserName,Email,NormalizedEmail,EmailConfirmed,PasswordHash,SecurityStamp,ConcurrencyStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] ApplicationUser applicationUser)
-        {
-            if (id != applicationUser.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(applicationUser);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ApplicationUserExists(applicationUser.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(applicationUser);
-        }
-
-        // GET: Usuarios/Delete/5
-        public async Task<IActionResult> Delete(Guid? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var applicationUser = await _context.ApplicationUser
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (applicationUser == null)
-            {
-                return NotFound();
-            }
-
-            return View(applicationUser);
-        }
-
-        // POST: Usuarios/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(Guid id)
-        {
-            var applicationUser = await _context.ApplicationUser.FindAsync(id);
-            _context.ApplicationUser.Remove(applicationUser);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return resp;
         }
 
         private bool ApplicationUserExists(Guid id)
