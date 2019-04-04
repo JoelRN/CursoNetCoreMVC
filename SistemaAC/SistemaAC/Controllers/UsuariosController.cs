@@ -113,7 +113,7 @@ namespace SistemaAC.Controllers
         string phoneNumber, int accessFailedCount, string concurrencyStamp, bool emailConfirmed,
         bool lockoutEnabled, DateTimeOffset lockoutEnd, string normalizedEmail,
         string normalizedUserName, string passwordHash, bool phoneNumberConfirmed,
-        string securityStamp, bool twoFactorEnabled, ApplicationUser applicationUser)
+        string securityStamp, bool twoFactorEnabled, string selectRole, ApplicationUser applicationUser)
         {
             var resp = "";
 
@@ -141,6 +141,23 @@ namespace SistemaAC.Controllers
                 //Actualizar los datos
                 _context.Update(applicationUser);
                 await _context.SaveChangesAsync();
+
+                //Obtenemos el usuario
+                var usuario = await _userManager.FindByIdAsync(id);
+
+                usuarioRole = await _usuarioRole.GetRole(_userManager, _roleManager, id);
+
+                if (usuarioRole[0].Text != "No Role") {
+                    await _userManager.RemoveFromRoleAsync(usuario, usuarioRole[0].Text);
+                }
+
+                if (selectRole == "No Role") {
+                    selectRole = "Usuario";
+                }
+
+                //Ahora si almacenamos el rol
+                var resultado = await _userManager.AddToRoleAsync(usuario, selectRole);
+
                 resp = "Save";
             }
             catch

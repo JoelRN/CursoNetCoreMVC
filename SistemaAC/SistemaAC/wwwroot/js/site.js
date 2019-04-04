@@ -26,6 +26,9 @@ var userName;
 var email;
 var phoneNumber;
 
+var role;
+var selectRole;
+
 //Otras variables donde almacenaremos los datos del registro, pero estos datos no serán modificados
 var accessFailedCount;
 var concurrencyStamp;
@@ -77,6 +80,8 @@ function editarUsuario(action) {
     id = $('input[name=Id]')[0].value;
     email = $('input[name=Email]')[0].value;
     phoneNumber = $('input[name=PhoneNumber]')[0].value;
+    role = document.getElementById('Select');
+    selectRole = role.options[role.selectedIndex].text;
 
     $.each(items, function (index, val) {
         userName = val.userName;
@@ -100,7 +105,7 @@ function editarUsuario(action) {
             id, userName, email, phoneNumber,
             accessFailedCount, concurrencyStamp, emailConfirmed, lockoutEnabled,
             lockoutEnd, normalizedEmail, normalizedUserName, passwordHash, phoneNumberConfirmed,
-            securityStamp, twoFactorEnabled
+            securityStamp, twoFactorEnabled, selectRole
         },
         success: function (response) {
             if (response === "Save") {
