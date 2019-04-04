@@ -19,7 +19,7 @@ namespace SistemaAC.Controllers
         RoleManager<ApplicationRole> _roleManager;
         UsuarioRole _usuarioRole;
         public List<SelectListItem> usuarioRole;
-        
+
         public UsuariosController(ApplicationDbContext context,
             UserManager<ApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager)
@@ -69,19 +69,51 @@ namespace SistemaAC.Controllers
             return View(usuario.ToList());
         }
 
-        public async Task<List<ApplicationUser>> GetUsuario(Guid id)
+        public async Task<List<Usuario>> GetUsuario(Guid id)
         {
-            List<ApplicationUser> usuario = new List<ApplicationUser>();
+            //Declaro un objeto list que depende de la clase Usuario
+            List<Usuario> usuario = new List<Usuario>();
             var appUsuario = await _context.ApplicationUser.SingleOrDefaultAsync(m => m.Id == id);
-            usuario.Add(appUsuario);
+            usuarioRole = await _usuarioRole.GetRole(_userManager, _roleManager, id.ToString());
+
+            usuario.Add(new Usuario()
+            {
+                Id = appUsuario.Id.ToString(),
+                UserName = appUsuario.UserName,
+                PhoneNumber = appUsuario.PhoneNumber,
+                Email = appUsuario.Email,
+                Role = usuarioRole[0].Text,
+                RoleId = usuarioRole[0].Value,
+                AccessFailedCount = appUsuario.AccessFailedCount,
+                ConcurrencyStamp = appUsuario.ConcurrencyStamp,
+                EmailConfirmed = appUsuario.EmailConfirmed,
+                LockoutEnabled = appUsuario.LockoutEnabled,
+                LockoutEnd = appUsuario.LockoutEnd,
+                NormalizedEmail = appUsuario.NormalizedEmail,
+                NormalizedUserName = appUsuario.NormalizedUserName,
+                PasswordHash = appUsuario.PasswordHash,
+                PhoneNumberConfirmed = appUsuario.PhoneNumberConfirmed,
+                SecurityStamp = appUsuario.SecurityStamp,
+                TwoFactorEnabled = appUsuario.TwoFactorEnabled
+            });
+
             return usuario;
         }
 
+        public List<SelectListItem> GetRoles()
+        {
+            //Creamos un objeto llamado rolesLista
+            List<SelectListItem> rolesLista = new List<SelectListItem>();
+            rolesLista = _usuarioRole.Roles(_roleManager);
+
+            return rolesLista;
+        }
+
         public async Task<string> EditUsuario(string id, string userName, string email,
-            string phoneNumber, int accessFailedCount, string concurrencyStamp, bool emailConfirmed,
-            bool lockoutEnabled, DateTimeOffset lockoutEnd, string normalizedEmail,
-            string normalizedUserName, string passwordHash, bool phoneNumberConfirmed,
-            string securityStamp, bool twoFactorEnabled, ApplicationUser applicationUser)
+        string phoneNumber, int accessFailedCount, string concurrencyStamp, bool emailConfirmed,
+        bool lockoutEnabled, DateTimeOffset lockoutEnd, string normalizedEmail,
+        string normalizedUserName, string passwordHash, bool phoneNumberConfirmed,
+        string securityStamp, bool twoFactorEnabled, ApplicationUser applicationUser)
         {
             var resp = "";
 
