@@ -167,6 +167,19 @@ namespace SistemaAC.Controllers
             return resp;
         }
 
+        public async Task<string> DeleteUsuario(string id) {
+            var resp = "";
+            try {
+                var applicationUser = await _context.ApplicationUser.SingleOrDefaultAsync(m => m.Id == new Guid(id));
+                _context.ApplicationUser.Remove(applicationUser);
+                await _context.SaveChangesAsync();
+                resp = "Delete";
+            } catch {
+                resp = "No Delete";
+            }
+            return resp;
+        }
+
         private bool ApplicationUserExists(Guid id)
         {
             return _context.ApplicationUser.Any(e => e.Id == id);
