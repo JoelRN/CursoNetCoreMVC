@@ -7,6 +7,10 @@ $('#modalEditar').on('shown.bs.modal', function () {
     $('#myInput').focus();
 });
 
+$('#modalAC').on('shown.bs.modal', function () {
+    $('#Nombre').focus();
+});
+
 function getUsuario(id, action) {
     $.ajax({
         type: "POST",
@@ -182,5 +186,26 @@ function crearUsuario(action) {
                 }
             });
         }
-    } 
+    }
 }
+$().ready(() => {
+    document.getElementById("filtrar").focus();
+    filtrarDatos(1);
+});
+
+var agregarCategoria = () => {
+    var nombre = document.getElementById("Nombre").value;
+    var descripcion = document.getElementById("Descripcion").value;
+    var estados = document.getElementById("Estado");
+    var estado = estados.options[estados.selectedIndex].value;
+    var action = 'Categorias/guardarCategoria';
+    var categoria = new Categorias(nombre, descripcion, estado, action);
+    categoria.agregarCategoria();
+};
+
+var filtrarDatos = (numPagina) => {
+    var valor = document.getElementById("filtrar").value;
+    var action = 'Categorias/filtrarDatos';
+    var categoria = new Categorias(valor, "", "", action);  // Como que no es muy flexible esta forma de manejar variables...
+    categoria.filtrarDatos(numPagina);
+};

@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SistemaAC.Data;
+using SistemaAC.ModelClass;
 using SistemaAC.Models;
 
 namespace SistemaAC.Controllers
@@ -13,10 +15,11 @@ namespace SistemaAC.Controllers
     public class CategoriasController : Controller
     {
         private readonly ApplicationDbContext _context;
-
+        private CategoriaModels categoriaModels;
         public CategoriasController(ApplicationDbContext context)
         {
             _context = context;
+            categoriaModels = new CategoriaModels(context);
         }
 
         // GET: Categorias
@@ -43,26 +46,14 @@ namespace SistemaAC.Controllers
             return View(categoria);
         }
 
-        // GET: Categorias/Create
-        public IActionResult Create()
+        public List<IdentityError> guardarCategoria(string nombre, string descripcion, string estado)
         {
-            return View();
+            return categoriaModels.guardarCategoria(nombre, descripcion, estado);
         }
 
-        // POST: Categorias/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CategoriaID,Nombre,Descripcion,Estado")] Categoria categoria)
+        public List<object[]> filtrarDatos(int numPagina, string valor)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(categoria);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(categoria);
+            return categoriaModels.filtrarDatos(numPagina, valor);
         }
 
         // GET: Categorias/Edit/5
