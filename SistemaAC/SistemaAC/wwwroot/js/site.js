@@ -217,5 +217,10 @@ var editarEstado = (id) => {
     var action = 'Categorias/getCategorias';
     var categoria = new Categorias("", "", "", action);
     categoria.getCategoria(id);
+};
 
-}
+var editarCategoria = () => {
+    var action = 'Categorias/editarCategoria';
+    var categoria = new Categorias("", "", "", action);
+    categoria.editarCategoria(idCategoria, "estado");
+};

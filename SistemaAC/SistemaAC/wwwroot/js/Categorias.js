@@ -57,7 +57,7 @@ class Categorias {
             data: {
                 valor, numPagina
             },
-            success: (response) => {                
+            success: (response) => {
                 console.log(response);
                 $.each(response, (index, val) => {
                     $("#resultSearch").html(val[0]);
@@ -74,7 +74,40 @@ class Categorias {
             data: { id },
             success: (response) => {
                 console.log(response);
+                if (response[0].estado) {
+                    document.getElementById("tituloCategoria").innerHTML = "Esta seguro de desactivar la categoría " + response[0].nombre;
+                } else {
+                    document.getElementById("tituloCategoria").innerHTML = "Esta seguro de habilitar la categoría " + response[0].nombre;
+                }
                 localStorage.setItem("categoria", JSON.stringify(response));
+            }
+        });
+    }
+    editarCategoria(id, funcion) {
+        var nombre = null;
+        var descripcion = null;
+        var estado = null;
+        var action = null;
+        switch (funcion) {
+            case "estado":
+                var response = JSON.parse(localStorage.getItem("categoria"));
+                nombre = response[0].nombre;
+                descripcion = response[0].descripcion;
+                estado = response[0].estado;
+                localStorage.removeItem("categoria");
+                break;
+            default:
+        }
+    }
+    editar(id, nombre, descripcion, estado, funcion) {
+        var action = this.action;
+        $.ajax({
+            type: "POST",
+            url: action,
+            data: { id, nombre, descripcion, estado, funcion },
+            success: (response) => {
+                console.log(response);
+                this.restablecer();
             }
         });
     }
