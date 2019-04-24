@@ -61,10 +61,10 @@ namespace SistemaAC.ModelClass
             {
                 if (item.Estado)
                 {
-                    Estado = "<a class='btn btn-success'>Activo</a>";
+                    Estado = "<a data-toggle='modal' data-target='#ModalEstado' onclick='editarEstado(" + item.CategoriaID + ")' class='btn btn-success'>Activo</a>";
                 }
                 else {
-                    Estado = "<a class='btn btn-danger'>No Activo</a>";
+                    Estado = "<a data-toggle='modal' data-target='#ModalEstado' onclick='editarEstado(" + item.CategoriaID + ")' class='btn btn-danger'>No Activo</a>";
                 }
                 dataFilter += "<tr>" +
                     "<td>" + item.Nombre + "</td>" +
@@ -80,5 +80,10 @@ namespace SistemaAC.ModelClass
             data.Add(dataObj);
             return data;
         }
-    }
+
+        public List<Categoria> getCategorias(int id) {
+            return context.Categoria.Where(c => c.CategoriaID == id).ToList();
+        }
+
+    }    
 }

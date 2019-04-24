@@ -56,6 +56,11 @@ namespace SistemaAC.Controllers
             return categoriaModels.filtrarDatos(numPagina, valor);
         }
 
+        public List<Categoria> getCategorias(int id)
+        {
+            return categoriaModels.getCategorias(id);
+        }
+
         // GET: Categorias/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {

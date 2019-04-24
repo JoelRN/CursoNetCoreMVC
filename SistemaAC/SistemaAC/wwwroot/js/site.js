@@ -193,6 +193,8 @@ $().ready(() => {
     filtrarDatos(1);
 });
 
+var idCategoria;
+
 var agregarCategoria = () => {
     var nombre = document.getElementById("Nombre").value;
     var descripcion = document.getElementById("Descripcion").value;
@@ -209,3 +211,11 @@ var filtrarDatos = (numPagina) => {
     var categoria = new Categorias(valor, "", "", action);  // Como que no es muy flexible esta forma de manejar variables...
     categoria.filtrarDatos(numPagina);
 };
+
+var editarEstado = (id) => {
+    idCategoria = id;
+    var action = 'Categorias/getCategorias';
+    var categoria = new Categorias("", "", "", action);
+    categoria.getCategoria(id);
+
+}
