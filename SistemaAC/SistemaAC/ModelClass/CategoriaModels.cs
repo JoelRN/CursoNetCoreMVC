@@ -11,10 +11,11 @@ namespace SistemaAC.ModelClass
     public class CategoriaModels
     {
         private ApplicationDbContext context;
+        private Boolean estados;
+
         public CategoriaModels(ApplicationDbContext context)
         {
             this.context = context;
-            filtrarDatos(1, "Android");
         }
         public List<IdentityError> guardarCategoria(string nombre, string descripcion, string estado)
         {
@@ -34,6 +35,7 @@ namespace SistemaAC.ModelClass
             });
             return errorList;
         }
+
         public List<object[]> filtrarDatos(int numPagina, string valor)
         {
             int count = 0, cant, numRegistros = 0, inicio = 0, reg_por_pagina = 2;
@@ -63,7 +65,8 @@ namespace SistemaAC.ModelClass
                 {
                     Estado = "<a data-toggle='modal' data-target='#ModalEstado' onclick='editarEstado(" + item.CategoriaID + ")' class='btn btn-success'>Activo</a>";
                 }
-                else {
+                else
+                {
                     Estado = "<a data-toggle='modal' data-target='#ModalEstado' onclick='editarEstado(" + item.CategoriaID + ")' class='btn btn-danger'>No Activo</a>";
                 }
                 dataFilter += "<tr>" +
@@ -81,9 +84,53 @@ namespace SistemaAC.ModelClass
             return data;
         }
 
-        public List<Categoria> getCategorias(int id) {
+        public List<Categoria> getCategorias(int id)
+        {
             return context.Categoria.Where(c => c.CategoriaID == id).ToList();
         }
-
-    }    
+                
+        public List<IdentityError> editarCategoria(int idCategoria, string nombre, string descripcion, Boolean estado, string funcion)
+        {
+            var errorList = new List<IdentityError>();
+            string code = "", des = "";
+            switch (funcion)
+            {
+                case "estado":
+                    if (estado)
+                    {
+                        estados = false;
+                    }
+                    else
+                    {
+                        estados = true;
+                    }
+                    var categoria = new Categoria()
+                    {
+                        CategoriaID = idCategoria,
+                        Nombre = nombre,
+                        Descripcion = descripcion,
+                        Estado = estados
+                    };
+                    try
+                    {
+                        context.Update(categoria);
+                        context.SaveChanges();
+                        code = "Save";
+                        des = "Save";
+                    }
+                    catch (Exception ex)
+                    {
+                        code = "error";
+                        des = ex.Message;
+                    }
+                    break;
+            }
+            errorList.Add(new IdentityError
+            {
+                Code = code,
+                Description = des
+            });
+            return errorList;
+        }
+    }
 }

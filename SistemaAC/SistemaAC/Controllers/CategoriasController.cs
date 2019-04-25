@@ -61,6 +61,11 @@ namespace SistemaAC.Controllers
             return categoriaModels.getCategorias(id);
         }
 
+        public List<IdentityError> editarCategoria(int id, string nombre, string descripcion, Boolean estado, string funcion)
+        {
+            return categoriaModels.editarCategoria(id, nombre, descripcion, estado, funcion);
+        }
+
         // GET: Categorias/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
